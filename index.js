@@ -5,53 +5,56 @@ const readline = require('readline').createInterface({
   output: process.stdout,
 });
 
-const readAreaCode = (value) => {
-  readline.close();
-  start(value);
-};
+class App {
+  options = {
+    minResults: -1,
+    maxResults: 40,
+  };
 
-const savePhoneNumber = (phoneNumber) => {
-  fs.appendFile('output.txt', phoneNumber + '\n', function (err, file) {
-    if (err) throw err;
-    console.log(phoneNumber);
-  });
-};
+  params = {
+    locationId: 0,
+    categoryId: 0,
+    q: '',
+  };
 
-const options = {
-  maxResults: 1,
-};
+  start = async () => {
+    readline.question('Set maximum number of results ', this.readMaxResults);
+  };
 
-const toSpaceFormat = (number) => {
-  number = number.toString();
-  return `${number.substring(0, 3)} ${number.substring(
-    3,
-    6
-  )} ${number.substring(6, 10)}`;
-};
+  readMaxResults = (value) => {
+    this.options.maxResults = parseInt(value);
+    readline.question('input 3-digit area code: ', this.readAreaCode);
+  };
 
-const start = async (areaCode) => {
-  let current = parseInt(areaCode + '0000000');
+  readAreaCode = (value) => {
+    this.params.q = value;
+    this.scrape();
+    readline.close();
+  };
 
-  while (true) {
-    const params = {
-      locationId: 0,
-      categoryId: 0,
-      q: current,
-    };
+  scrape = async () => {
+    console.log('Searching please wait...');
+    let result = await kijiji.search(this.params, this.options);
 
-    let result = await kijiji.search(params, options);
-
-    if (result.length > 0) {
-      savePhoneNumber(current);
-    } else {
-      params.q = toSpaceFormat(current);
-      result = await kijiji.search(params, options);
-      if (result.length > 0) {
-        savePhoneNumber(current);
-      }
+    for (let i = 0; i < result.length; i++) {
+      const currentAd = result[i];
+      const foundNumbers = /(?:[-+() ]*\d){10,13}/g.exec(currentAd.description);
+      if (foundNumbers)
+        for (let j = 0; j < foundNumbers.length; j++) {
+          this.savePhoneNumber(foundNumbers[j]);
+          console.log(foundNumbers[j]);
+        }
     }
-    current++;
-  }
-};
+    console.log('Program Finished');
+  };
 
-readline.question('input 3-digit area code: ', readAreaCode);
+  savePhoneNumber = (phoneNumber) => {
+    fs.appendFile('output.txt', phoneNumber + '\n', function (err, file) {
+      if (err) throw err;
+    });
+  };
+}
+
+const app = new App();
+
+app.start();
