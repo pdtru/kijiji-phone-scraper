@@ -8,23 +8,29 @@
 
 ## Getting Started
 
-<br>
-
 ### Prerequisites
 
-- Install node on your local machine: [Here](https://nodejs.org/en/download/current)
+- Install node on your machine: [Download](https://nodejs.org/en/download/current)
 
 ## Usage
 
-- Install dependecnies by running the following command in the terminal:
+1. Download the project zip file onto your machine: [Download](https://github.com/pdtru/kijiji-phone-scraper/archive/refs/heads/master.zip)
+
+2. Extract all the files into an empty folder
+
+3. Open terminal and use the 'cd' command to change the directory to the folder where you exracted the project. For example, if you extracted the project into your downloads folder then you would use the command:
+
+```sh
+cd downloads/kijiji-phone-scraper-master
+```
+
+4. Install project dependencies by running the following command in the terminal:
 
 ```sh
 npm install
 ```
 
-<br>
-
-- Run the program with the following command:
+5. Run the program with the following command:
 
 ```sh
 node index.js
